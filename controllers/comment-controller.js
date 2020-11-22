@@ -28,6 +28,38 @@ const commentController = {
       .catch((err) => res.json(err));
   },
 
+  addReply({ params, body }, res) {
+    Comment.findOneAndUpdate(
+      { _id: params.commentId },
+      //If we want to avoid duplicates, we can use $addToSet instead of push.
+      //it does the same thing as $push, but blocks any duplicates.
+      { $push: { replies: body } },
+      //this will return the update object
+      { new: true }
+    )
+      .then((dbPizzaData) => {
+        if (!dbPizzaData) {
+          res.status(404).json({ message: "No pizza found with this id!" });
+          return;
+        }
+        res.json(dbPizzaData);
+      })
+      .catch((err) => res.json(err));
+  },
+
+  // remove reply
+  removeReply({ params }, res) {
+    Comment.findOneAndUpdate(
+      // for this we need 2 ids, the comment id and reply id
+      { _id: params.commentId },
+      //here we pull the nested replies array from the comments and grab the replyId from there.
+      { $pull: { replies: { replyId: params.replyId } } },
+      { new: true }
+    )
+      .then((dbPizzaData) => res.json(dbPizzaData))
+      .catch((err) => res.json(err));
+  },
+
   // remove comment
   removeComment({ params }, res) {
     //this finds the comment, deletes it and returns the updated document/data
