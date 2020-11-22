@@ -5,6 +5,19 @@ const pizzaController = {
   // get all pizzas
   getAllPizza(req, res) {
     Pizza.find({})
+      //populate a filed (similar to joining tables) with a key/value pair
+      //of path and the field we want populated.
+      .populate({
+        path: "comments",
+        //used the select option inside of populate(), so that we can tell
+        //Mongoose that we don't care about the __v field on comments
+        //the minus (-) sign in front of the field indicates we dont want it returned.
+        select: "-__v",
+      })
+      //we dont want the __v include in the pizza data either
+      .select("-__v")
+      //newest pizza returns first using sort (-1, says in DESC order by id value)
+      .sort({ _id: -1 })
       .then((dbPizzaData) => res.json(dbPizzaData))
       .catch((err) => {
         console.log(err);
@@ -15,10 +28,15 @@ const pizzaController = {
   // GET /api/pizzas/id
   // get one pizza by id
   //req was destructured to only pull params out of it
+  // get one pizza by id
   getPizzaById({ params }, res) {
     Pizza.findOne({ _id: params.id })
+      .populate({
+        path: "comments",
+        select: "-__v",
+      })
+      .select("-__v")
       .then((dbPizzaData) => {
-        // If no pizza is found, send 404
         if (!dbPizzaData) {
           res.status(404).json({ message: "No pizza found with this id!" });
           return;
@@ -70,7 +88,7 @@ const pizzaController = {
           res.status(404).json({ message: "No pizza found with this id!" });
           return;
         }
-        res.json(dbPizzaData);
+        res.json(dbPizzaData); //could send res.json(true) instead
       })
       .catch((err) => res.status(400).json(err));
   },
