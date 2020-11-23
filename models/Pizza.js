@@ -4,10 +4,15 @@ const dateFormat = require("../utils/dateFormat");
 const PizzaSchema = new Schema(
   {
     pizzaName: {
-      type: String, //type String is the JS datatypes.
+      type: String,
+      required: "You need to provide a pizza name!",
+      //removes any white space before or after input string
+      trim: true,
     },
     createdBy: {
       type: String,
+      required: true,
+      trim: true,
     },
     // a getter is typically a special type of function that takes the stored data you are
     //looking to retrieve and modifies or formats it upon return.
@@ -19,8 +24,14 @@ const PizzaSchema = new Schema(
       // the data is queried
       get: (createdAtVal) => dateFormat(createdAtVal),
     },
+    /*
+    enum option stands for enumerable, a popular 
+    term in web development that refers to a set of data that can be iterated over
+    */
     size: {
       type: String,
+      required: true,
+      enum: ["Personal", "Small", "Medium", "Large", "Extra Large"],
       default: "Large",
     },
     toppings: [], //could also use Array as the data type

@@ -35,7 +35,7 @@ const commentController = {
       //it does the same thing as $push, but blocks any duplicates.
       { $push: { replies: body } },
       //this will return the update object
-      { new: true }
+      { new: true, runValidators: true }
     )
       .then((dbPizzaData) => {
         if (!dbPizzaData) {
